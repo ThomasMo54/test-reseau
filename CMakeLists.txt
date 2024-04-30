@@ -8,6 +8,12 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_net REQUIRED)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS} ${SDL2_NET_INCLUDE_DIRS})
 
-add_executable(test_reseau main.cpp)
+add_executable(server
+        Server/server.cpp
+)
+add_executable(client
+        Client/client.cpp
+)
 
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2_NET_LIBRARIES})
+target_link_libraries(server ${SDL2_LIBRARIES} ${SDL2_NET_LIBRARIES})
+target_link_libraries(client ${SDL2_LIBRARIES} ${SDL2_NET_LIBRARIES})
