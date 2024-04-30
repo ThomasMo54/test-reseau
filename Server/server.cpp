@@ -43,12 +43,14 @@ std::unique_ptr<TCPsocket> acceptClient(std::unique_ptr<TCPsocket> &server) {
 
 void handleCommunication(std::unique_ptr<TCPsocket> &client) {
     char message[1024];
-    int len = SDLNet_TCP_Recv(*client, message, 1024);
-    if (len > 0) {
-        message[len] = '\0';
-        std::cout << "Received: " << message << std::endl;
+    while (strcmp(message, "exit")) {
+        int len = SDLNet_TCP_Recv(*client, message, 1024);
+        if (len > 0) {
+            message[len] = '\0';
+            std::cout << "Received: " << message << std::endl;
+        }
+        SDLNet_TCP_Send(*client, message, len);
     }
-    SDLNet_TCP_Send(*client, message, len);
 }
 
 void closeServer() {

@@ -2,6 +2,7 @@
 #include <SDL2/SDL_net.h>
 #include <iostream>
 #include <memory>
+#include <string>
 
 const char* SERVER_IP = "127.0.0.1";
 const int SERVER_PORT = 12345;
@@ -34,10 +35,9 @@ std::unique_ptr<TCPsocket> initClient() {
     return std::make_unique<TCPsocket>(client);
 }
 
-void handleCommunication(std::unique_ptr<TCPsocket> &client) {
-    char message[1024] = "Hello!";
+void sendMessage(std::unique_ptr<TCPsocket> &client, const char* message) {
     SDLNet_TCP_Send(*client, message, strlen(message) + 1);
-    std::cout << "Received: " << message << std::endl;
+    std::cout << "Sent: " << message << std::endl;
     char received[1024];
     int len = SDLNet_TCP_Recv(*client, received, 1024);
     if (len > 0) {
@@ -54,7 +54,12 @@ void closeClient() {
 int main() {
     initSDL();
     std::unique_ptr<TCPsocket> client = initClient();
-    handleCommunication(client);
+    std::string message;
+    while (message != "exit") {
+        std::cout << "Enter a message: ";
+        std::cin >> message;
+        sendMessage(client, message.c_str());
+    }
     closeClient();
     return 0;
 }
