@@ -14,6 +14,9 @@ add_executable(server
 )
 add_executable(client
         Client/client.cpp
+        Client/Client.cpp
+        Client/Client.hpp
+        Client/ClientException.hpp
 )
 
 target_link_libraries(server ${SDL2_LIBRARIES} ${SDL2_NET_LIBRARIES})

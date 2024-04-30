@@ -3,6 +3,8 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include "Client.hpp"
+#include "ClientException.hpp"
 
 const char* SERVER_IP = "127.0.0.1";
 const int SERVER_PORT = 12345;
@@ -18,48 +20,40 @@ void initSDL() {
     }
 }
 
-std::unique_ptr<TCPsocket> initClient() {
-    std::cout << "Connecting to server..." << std::endl;
-    IPaddress ip;
-    TCPsocket client;
-    if (SDLNet_ResolveHost(&ip, SERVER_IP, SERVER_PORT) == -1) {
-        std::cerr << "SDLNet_ResolveHost Error: " << SDLNet_GetError() << std::endl;
-        exit(1);
-    }
-    client = SDLNet_TCP_Open(&ip);
-    if (!client) {
-        std::cerr << "SDLNet_TCP_Open Error: " << SDLNet_GetError() << std::endl;
-        exit(1);
-    }
-    std::cout << "Connected to server" << std::endl;
-    return std::make_unique<TCPsocket>(client);
+void onMessageReceived(const std::string &message) {
+    std::cout << "Received: " << message << std::endl;
 }
 
-void sendMessage(std::unique_ptr<TCPsocket> &client, const char* message) {
-    SDLNet_TCP_Send(*client, message, strlen(message) + 1);
-    std::cout << "Sent: " << message << std::endl;
-    char received[1024];
-    int len = SDLNet_TCP_Recv(*client, received, 1024);
-    if (len > 0) {
-        received[len] = '\0';
-        std::cout << "Received: " << received << std::endl;
-    }
-}
-
-void closeClient() {
+void quitSDL() {
     SDLNet_Quit();
     SDL_Quit();
 }
 
 int main() {
     initSDL();
-    std::unique_ptr<TCPsocket> client = initClient();
+
+    Client client(SERVER_IP, SERVER_PORT);
+    client.setReceiveCallback(onMessageReceived);
+
+    try {
+        client.connect();
+    } catch (const ClientException &e) {
+        std::cerr << e.what() << std::endl;
+        quitSDL();
+        return 1;
+    }
+
     std::string message;
     while (message != "exit") {
-        std::cout << "Enter a message: ";
         std::cin >> message;
-        sendMessage(client, message.c_str());
+        try {
+            client.send(message);
+        } catch (const ClientException &e) {
+            std::cerr << e.what() << std::endl;
+        }
     }
-    closeClient();
+
+    client.disconnect();
+    quitSDL();
     return 0;
 }
