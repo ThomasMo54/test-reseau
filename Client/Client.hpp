@@ -17,6 +17,8 @@ public:
 
     void disconnect();
 
+    bool isConnected() const;
+
     void send(const std::string &message);
 
     void setReceiveCallback(void (*callback)(const std::string &message));

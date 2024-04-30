@@ -11,6 +11,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS} ${SDL2_NET_
 
 add_executable(server
         Server/server.cpp
+        Server/Server.cpp
+        Server/Server.hpp
+        Server/ServerException.hpp
 )
 add_executable(client
         Client/client.cpp

@@ -22,6 +22,10 @@ void Client::disconnect() {
     socket = nullptr;
 }
 
+bool Client::isConnected() const {
+    return socket != nullptr;
+}
+
 void Client::send(const std::string &message) {
     if (SDLNet_TCP_Send(socket, message.c_str(), message.size() + 1) == -1) {
         throw ClientException(SDLNet_GetError());
